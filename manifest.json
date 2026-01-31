@@ -2,7 +2,7 @@
     "name": "Lennards Kellnerapp",
     "short_name": "Kellner",
     "description": "Lennards Kellnerapp - Tische, Bestellungen, Preise",
-    "start_url": "/",
+    "start_url": "/Kellnerapp/",
     "display": "standalone",
     "background_color": "#0f0f1a",
     "theme_color": "#1a1a2e",
