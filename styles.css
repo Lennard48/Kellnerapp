@@ -34,7 +34,8 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     overflow: hidden;
 }
@@ -158,6 +159,15 @@ body {
 
 .btn-success:active {
     background: var(--success-dark);
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: #000;
+}
+
+.btn-warning:active {
+    background: #e5ac00;
 }
 
 .btn-large {
@@ -336,6 +346,17 @@ body {
 .order-item.paid {
     opacity: 0.5;
     background: var(--bg-secondary);
+}
+
+.order-item.delivered {
+    border-left: 3px solid var(--success);
+}
+
+.delivered-badge {
+    color: var(--success);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 10px;
 }
 
 .order-item .order-header {
@@ -524,14 +545,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 8px 16px;
+    gap: 2px;
+    padding: 6px 8px;
     background: none;
     border: none;
     color: var(--text-muted);
     cursor: pointer;
     transition: color 0.2s ease;
     position: relative;
+    min-width: 0;
+    flex: 1;
 }
 
 .nav-btn.active {
@@ -539,12 +562,13 @@ body {
 }
 
 .nav-icon {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .nav-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .nav-badge {
@@ -568,6 +592,11 @@ body {
 
 .nav-badge.fetch-badge {
     background: var(--warning);
+    color: #000;
+}
+
+.nav-badge.above-badge {
+    background: #4fc3f7;
     color: #000;
 }
 
@@ -651,8 +680,15 @@ body {
 
 /* Animations */
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
 }
 
 .timer-warning {

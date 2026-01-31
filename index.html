@@ -62,9 +62,18 @@
             <section id="view-fetch" class="view">
                 <div class="view-header">
                     <h2>📦 Von unten holen</h2>
-                    <button class="btn btn-secondary" onclick="refreshFetchList()">↻ Aktualisieren</button>
+                    <button class="btn btn-secondary" onclick="refreshFetchList()">↻</button>
                 </div>
                 <div id="fetchList" class="fetch-list"></div>
+            </section>
+
+            <!-- Von Oben View -->
+            <section id="view-fetchAbove" class="view">
+                <div class="view-header">
+                    <h2>⬆️ Von oben</h2>
+                    <button class="btn btn-secondary" onclick="refreshFetchAboveList()">↻</button>
+                </div>
+                <div id="fetchAboveList" class="fetch-list"></div>
             </section>
         </main>
 
@@ -80,12 +89,17 @@
             </button>
             <button class="nav-btn" data-view="order" onclick="switchView('order')">
                 <span class="nav-icon">🧾</span>
-                <span class="nav-label">Bestellung</span>
+                <span class="nav-label">Bestell.</span>
                 <span class="nav-badge" id="orderBadge">0</span>
             </button>
+            <button class="nav-btn" data-view="fetchAbove" onclick="switchView('fetchAbove')">
+                <span class="nav-icon">⬆️</span>
+                <span class="nav-label">Oben</span>
+                <span class="nav-badge above-badge" id="fetchAboveBadge">0</span>
+            </button>
             <button class="nav-btn" data-view="fetch" onclick="switchView('fetch')">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">Von unten</span>
+                <span class="nav-icon">⬇️</span>
+                <span class="nav-label">Unten</span>
                 <span class="nav-badge fetch-badge" id="fetchBadge">0</span>
             </button>
         </nav>
