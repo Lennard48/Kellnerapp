@@ -1,5 +1,5 @@
 // Service Worker for Lennards Kellnerapp
-const CACHE_NAME = 'kellner-app-v5';
+const CACHE_NAME = 'kellner-app-v6';
 const ASSETS = [
     '/',
     '/index.html',
