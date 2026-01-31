@@ -1,5 +1,5 @@
-// Service Worker for Kellner App - Fasching 2026
-const CACHE_NAME = 'kellner-app-v2';
+// Service Worker for Lennards Kellnerapp
+const CACHE_NAME = 'kellner-app-v3';
 const ASSETS = [
     '/',
     '/index.html',

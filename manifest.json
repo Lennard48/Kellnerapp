@@ -1,7 +1,7 @@
 {
-    "name": "Kellner App",
+    "name": "Lennards Kellnerapp",
     "short_name": "Kellner",
-    "description": "Kellner App für Fasching 2026 - Tische, Bestellungen, Preise",
+    "description": "Lennards Kellnerapp - Tische, Bestellungen, Preise",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0f0f1a",

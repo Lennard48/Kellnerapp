@@ -70,6 +70,7 @@ function init() {
     renderCategoryTabs();
     renderMenu();
     updateBadges();
+    updateCurrentTableDisplay();
     startTimerUpdates();
 
     // Register service worker
