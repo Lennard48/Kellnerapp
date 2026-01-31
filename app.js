@@ -490,10 +490,10 @@ function renderFetchFromAbove() {
 
     if (fetchItems.length === 0) {
         container.innerHTML = `
-        < div class= "empty-state" >
+            <div class="empty-state">
                 <div class="empty-icon">✅</div>
-                <p>Alles von oben ausgeliefert!</p>
-            </div >
+                <p>Alles von oben geliefert!</p>
+            </div>
         `;
         return;
     }
@@ -511,11 +511,11 @@ function renderFetchFromAbove() {
     });
 
     container.innerHTML = Object.values(groupedByTable).map(group => `
-        < div class= "fetch-group fetch-above-group" >
-        <div class="fetch-group-header">
-            <span>🪑 ${escapeHtml(group.tableName)}</span>
-            <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück</span>
-        </div>
+        <div class="fetch-group">
+            <div class="fetch-group-header">
+                <span>🪑 ${escapeHtml(group.tableName)}</span>
+                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück</span>
+            </div>
             ${group.items.map(item => `
                 <div class="fetch-item-row">
                     <div class="fetch-item-info">
@@ -526,10 +526,9 @@ function renderFetchFromAbove() {
                     <span class="fetch-item-qty">${item.quantity}x</span>
                     <button class="btn btn-small btn-warning" onclick="markDelivered(${item.tableId}, ${item.id})">📤</button>
                 </div>
-            `).join('')
-        }
-        </div >
-        `).join('');
+            `).join('')}
+        </div>
+    `).join('');
 }
 
 function refreshFetchAboveList() {
