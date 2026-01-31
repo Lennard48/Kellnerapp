@@ -1,12 +1,13 @@
 // Service Worker for Lennards Kellnerapp
-const CACHE_NAME = 'kellner-app-v6';
+const CACHE_NAME = 'kellner-app-v7';
+const BASE_PATH = '/Kellnerapp';
 const ASSETS = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/app.js',
-    '/manifest.json',
-    '/icon-192.png'
+    `${BASE_PATH}/`,
+    `${BASE_PATH}/index.html`,
+    `${BASE_PATH}/styles.css`,
+    `${BASE_PATH}/app.js`,
+    `${BASE_PATH}/manifest.json`,
+    `${BASE_PATH}/icon-192.png`
 ];
 
 // Install - cache all assets
@@ -18,7 +19,7 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Activate - clean old caches
+// Activate - clean old caches immediately
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then(keys => {
@@ -30,11 +31,18 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch - serve from cache, fallback to network
+// Fetch - network first, fallback to cache
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request)
-            .then(response => response || fetch(event.request))
-            .catch(() => caches.match('/index.html'))
+        fetch(event.request)
+            .then(response => {
+                // Clone and cache the response
+                const responseClone = response.clone();
+                caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, responseClone);
+                });
+                return response;
+            })
+            .catch(() => caches.match(event.request))
     );
 });
