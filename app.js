@@ -61,7 +61,8 @@ let state = {
     selectedTableId: null,
     activeCategory: "Alle",
     pendingComment: null, // { orderId, tableId }
-    filterOpenOnly: false
+    filterOpenOnly: false,
+    showAllOrders: false
 };
 
 // ========== INITIALIZATION ==========
@@ -148,8 +149,8 @@ function renderTables() {
         areas[area].push(table);
     });
 
-    // Sort areas (Links, Mitte, Rechts, Außen, Ohne Bereich)
-    const areaOrder = ['Links', 'Mitte', 'Rechts', 'Außen', 'Ohne Bereich'];
+    // Sort areas (Links, Mitte, Rechts, Andere, Ohne Bereich)
+    const areaOrder = ['Links', 'Mitte', 'Rechts', 'Andere', 'Ohne Bereich'];
     const sortedAreas = Object.keys(areas).sort((a, b) => {
         const aIdx = areaOrder.indexOf(a);
         const bIdx = areaOrder.indexOf(b);
@@ -316,65 +317,148 @@ function addToOrder(productId) {
 function renderOrder() {
     const container = document.getElementById('orderList');
     const footer = document.getElementById('orderFooter');
+    const titleEl = document.getElementById('orderViewTitle');
+    const allOrdersBtn = document.getElementById('allOrdersBtn');
+    const tableBadge = document.getElementById('orderTableBadge');
 
-    if (!state.selectedTableId) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🪑</div>
-                <p>Bitte wähle zuerst einen Tisch</p>
-            </div>
-        `;
-        footer.classList.remove('visible');
-        return;
+    // Update button and title state
+    if (allOrdersBtn) {
+        allOrdersBtn.classList.toggle('active', state.showAllOrders);
     }
 
-    const table = state.tables.find(t => t.id === state.selectedTableId);
-    const unpaidOrders = table.orders.filter(o => !o.isPaid);
+    if (state.showAllOrders) {
+        // Show all orders from all tables
+        titleEl.textContent = 'Alle Bestellungen';
+        tableBadge.style.display = 'none';
 
-    if (unpaidOrders.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">✨</div>
-                <p>Keine offenen Bestellungen</p>
-            </div>
-        `;
-        footer.classList.remove('visible');
-        return;
-    }
+        // Collect all unpaid orders from all tables
+        const allOrders = [];
+        state.tables.forEach(table => {
+            table.orders.filter(o => !o.isPaid).forEach(order => {
+                allOrders.push({ ...order, tableId: table.id, tableName: table.name });
+            });
+        });
 
-    container.innerHTML = unpaidOrders.map(order => {
-        const product = PRODUCTS.find(p => p.id === order.productId);
-        const timerText = getTimerText(order.timestamp);
-        const isOld = Date.now() - order.timestamp > 10 * 60 * 1000; // 10 minutes
-        const isDelivered = order.isDelivered;
-
-        return `
-            <div class="order-item ${isDelivered ? 'delivered' : ''}">
-                <div class="order-header">
-                    <div class="order-name">${escapeHtml(product.name)}${product.size ? ` (${product.size})` : ''}${isDelivered ? ' ✓' : ''}</div>
-                    <div class="order-timer ${isOld ? 'timer-warning' : ''}">⏱️ ${timerText}</div>
+        if (allOrders.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p>Keine offenen Bestellungen</p>
                 </div>
-                ${order.comment ? `<div class="order-comment">💬 ${escapeHtml(order.comment)}</div>` : ''}
-                <div class="order-controls">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="updateQuantity(${table.id}, ${order.id}, -1)">−</button>
-                        <span class="quantity">${order.quantity}</span>
-                        <button class="quantity-btn" onclick="updateQuantity(${table.id}, ${order.id}, 1)">+</button>
+            `;
+            footer.classList.remove('visible');
+            return;
+        }
+
+        // Group by table
+        const groupedByTable = {};
+        allOrders.forEach(order => {
+            if (!groupedByTable[order.tableId]) {
+                groupedByTable[order.tableId] = { tableName: order.tableName, orders: [] };
+            }
+            groupedByTable[order.tableId].orders.push(order);
+        });
+
+        container.innerHTML = Object.entries(groupedByTable).map(([tableId, group]) => `
+            <div class="order-group">
+                <div class="order-group-header">🪑 ${escapeHtml(group.tableName)} - ${formatPrice(calculateTableTotal(parseInt(tableId)))}</div>
+                ${group.orders.map(order => {
+            const product = PRODUCTS.find(p => p.id === order.productId);
+            const isDelivered = order.isDelivered;
+            return `
+                        <div class="order-item ${isDelivered ? 'delivered' : ''}">
+                            <div class="order-header">
+                                <div class="order-name">${escapeHtml(product.name)}${product.size ? ` (${product.size})` : ''}${isDelivered ? ' ✓' : ''}</div>
+                                <div class="order-price">${formatPrice(product.price * order.quantity)}</div>
+                            </div>
+                            <div class="order-controls">
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" onclick="updateQuantity(${tableId}, ${order.id}, -1)">−</button>
+                                    <span class="quantity">${order.quantity}</span>
+                                    <button class="quantity-btn" onclick="updateQuantity(${tableId}, ${order.id}, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+        }).join('')}
+            </div>
+        `).join('');
+
+        // Calculate total for all tables
+        const totalAll = state.tables.reduce((sum, t) => sum + calculateTableTotal(t.id), 0);
+        document.getElementById('orderTotal').textContent = formatPrice(totalAll);
+        footer.classList.add('visible');
+
+    } else {
+        // Single table view (original behavior)
+        titleEl.textContent = 'Aktuelle Bestellung';
+        tableBadge.style.display = 'block';
+
+        if (!state.selectedTableId) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🪑</div>
+                    <p>Bitte wähle zuerst einen Tisch</p>
+                </div>
+            `;
+            footer.classList.remove('visible');
+            return;
+        }
+
+        const table = state.tables.find(t => t.id === state.selectedTableId);
+        const unpaidOrders = table.orders.filter(o => !o.isPaid);
+
+        if (unpaidOrders.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p>Keine offenen Bestellungen</p>
+                </div>
+            `;
+            footer.classList.remove('visible');
+            return;
+        }
+
+        container.innerHTML = unpaidOrders.map(order => {
+            const product = PRODUCTS.find(p => p.id === order.productId);
+            const timerText = getTimerText(order.timestamp);
+            const isOld = Date.now() - order.timestamp > 10 * 60 * 1000; // 10 minutes
+            const isDelivered = order.isDelivered;
+
+            return `
+                <div class="order-item ${isDelivered ? 'delivered' : ''}">
+                    <div class="order-header">
+                        <div class="order-name">${escapeHtml(product.name)}${product.size ? ` (${product.size})` : ''}${isDelivered ? ' ✓' : ''}</div>
+                        <div class="order-timer ${isOld ? 'timer-warning' : ''}">⏱️ ${timerText}</div>
                     </div>
-                    <div class="order-price">${formatPrice(product.price * order.quantity)}</div>
+                    ${order.comment ? `<div class="order-comment">💬 ${escapeHtml(order.comment)}</div>` : ''}
+                    <div class="order-controls">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity(${table.id}, ${order.id}, -1)">−</button>
+                            <span class="quantity">${order.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${table.id}, ${order.id}, 1)">+</button>
+                        </div>
+                        <div class="order-price">${formatPrice(product.price * order.quantity)}</div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-small btn-secondary" onclick="showCommentModal(${table.id}, ${order.id})">💬 Kommentar</button>
+                        ${!isDelivered ? `<button class="btn btn-small btn-warning" onclick="markDelivered(${table.id}, ${order.id})">📤 Ausgeliefert</button>` : `<span class="delivered-badge">✓ Geliefert</span>`}
+                    </div>
                 </div>
-                <div class="order-actions">
-                    <button class="btn btn-small btn-secondary" onclick="showCommentModal(${table.id}, ${order.id})">💬 Kommentar</button>
-                    ${!isDelivered ? `<button class="btn btn-small btn-warning" onclick="markDelivered(${table.id}, ${order.id})">📤 Ausgeliefert</button>` : `<span class="delivered-badge">✓ Geliefert</span>`}
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
 
-    // Update total
-    const total = calculateTableTotal(state.selectedTableId);
-    document.getElementById('orderTotal').textContent = formatPrice(total);
-    footer.classList.add('visible');
+        // Update total
+        const total = calculateTableTotal(state.selectedTableId);
+        document.getElementById('orderTotal').textContent = formatPrice(total);
+        footer.classList.add('visible');
+    }
+}
+
+// Toggle all orders view
+function toggleAllOrders() {
+    state.showAllOrders = !state.showAllOrders;
+    renderOrder();
 }
 
 function updateQuantity(tableId, orderId, delta) {

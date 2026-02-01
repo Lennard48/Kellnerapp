@@ -412,6 +412,20 @@ body {
     padding: 6px 10px;
 }
 
+/* Order Group (All Orders View) */
+.order-group {
+    margin-bottom: 20px;
+}
+
+.order-group-header {
+    background: var(--accent);
+    color: white;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
 .order-item .order-header {
     display: flex;
     justify-content: space-between;

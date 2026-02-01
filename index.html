@@ -52,8 +52,12 @@
             <!-- Bestellung View -->
             <section id="view-order" class="view">
                 <div class="view-header">
-                    <h2>Aktuelle Bestellung</h2>
-                    <div class="table-badge" id="orderTableBadge">Tisch wählen</div>
+                    <h2 id="orderViewTitle">Aktuelle Bestellung</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary filter-btn" id="allOrdersBtn" onclick="toggleAllOrders()">Alle
+                            Tische</button>
+                        <div class="table-badge" id="orderTableBadge">Tisch wählen</div>
+                    </div>
                 </div>
                 <div id="orderList" class="order-list"></div>
                 <div class="order-footer" id="orderFooter">
@@ -125,7 +129,7 @@
                     <option value="Links">Links</option>
                     <option value="Mitte">Mitte</option>
                     <option value="Rechts">Rechts</option>
-                    <option value="Außen">Außen</option>
+                    <option value="Andere">Andere</option>
                 </select>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" onclick="closeModal('addTableModal')">Abbrechen</button>
