@@ -554,7 +554,7 @@ function renderFetchList() {
 
     container.innerHTML = Object.entries(groupedByTable).map(([tableId, group]) => `
         <div class="fetch-group">
-            <div class="fetch-group-header" onclick="goToTableOrder(${tableId})" style="cursor: pointer;">
+            <div class="fetch-group-header" onclick="goToTableOrder(${parseInt(tableId)})" style="cursor: pointer;">
                 <span>🪑 ${escapeHtml(group.tableName)}</span>
                 <span class="goto-order-btn">📋 Zur Bestellung</span>
             </div>
@@ -623,7 +623,7 @@ function renderFetchFromAbove() {
 
     container.innerHTML = Object.entries(groupedByTable).map(([tableId, group]) => `
         <div class="fetch-group">
-            <div class="fetch-group-header" onclick="goToTableOrder(${tableId})" style="cursor: pointer;">
+            <div class="fetch-group-header" onclick="goToTableOrder(${parseInt(tableId)})" style="cursor: pointer;">
                 <span>🪑 ${escapeHtml(group.tableName)}</span>
                 <span class="goto-order-btn">📋 Zur Bestellung</span>
             </div>
