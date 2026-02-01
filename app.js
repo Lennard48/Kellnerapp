@@ -239,9 +239,11 @@ function deleteTable(tableId) {
 
 function updateCurrentTableDisplay() {
     const table = state.tables.find(t => t.id === state.selectedTableId);
-    document.getElementById('currentTable').textContent = table ? table.name : 'Kein Tisch';
-    document.getElementById('menuTableBadge').textContent = table ? table.name : 'Tisch wählen';
-    document.getElementById('orderTableBadge').textContent = table ? table.name : 'Tisch wählen';
+    const currentTableEl = document.getElementById('currentTable');
+    const menuBadgeEl = document.getElementById('menuTableBadge');
+
+    if (currentTableEl) currentTableEl.textContent = table ? table.name : 'Kein Tisch';
+    if (menuBadgeEl) menuBadgeEl.textContent = table ? table.name : 'Tisch wählen';
 }
 
 // ========== MENU ==========
