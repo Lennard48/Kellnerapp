@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Kellner App - Fasching 2026</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <h1>🍽️ Kellner App</h1>
+            <div class="header-info">
+                <span id="currentTable">Kein Tisch</span>
+            </div>
+        </header>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tische View -->
+            <section id="view-tables" class="view active">
+                <div class="view-header">
+                    <h2>Tische</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary filter-btn" id="filterOpenBtn" onclick="toggleOpenFilter()">Nur
+                            Offene</button>
+                        <button class="btn btn-primary" onclick="showAddTableModal()">+ Neuer Tisch</button>
+                    </div>
+                </div>
+                <div id="tablesList" class="tables-grid"></div>
+            </section>
+
+            <!-- Speisekarte View -->
+            <section id="view-menu" class="view">
+                <div class="view-header">
+                    <h2>Speisekarte</h2>
+                    <button class="btn btn-secondary" onclick="showMenuEditor()">⚙️ Bearbeiten</button>
+                </div>
+                <div class="category-tabs" id="categoryTabs"></div>
+                <div id="menuList" class="menu-list"></div>
+            </section>
+
+            <!-- Bestellung View -->
+            <section id="view-order" class="view">
+                <div class="view-header">
+                    <div class="header-left">
+                        <button class="btn btn-secondary back-btn" id="orderBackBtn" onclick="showOrderOverview()"
+                            style="display: none;">← Zurück</button>
+                        <h2 id="orderViewTitle">Alle Bestellungen</h2>
+                    </div>
+                </div>
+                <div id="orderList" class="order-list"></div>
+                <div class="order-footer" id="orderFooter">
+                    <div class="order-total">
+                        <span>Gesamt:</span>
+                        <span id="orderTotal">0,00 €</span>
+                    </div>
+                    <button class="btn btn-success btn-large" id="markPaidBtn" onclick="markAllPaid()">✓ Alles
+                        bezahlt</button>
+                </div>
+            </section>
+
+            <!-- Von Unten View -->
+            <section id="view-fetch" class="view">
+                <div class="view-header">
+                    <h2>📦 Zu bestellen</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-success" onclick="copyFetchListToClipboard()"
+                            title="Für WhatsApp kopieren">📋</button>
+                        <button class="btn btn-secondary" onclick="refreshFetchList()">↻</button>
+                    </div>
+                </div>
+                <div id="fetchList" class="fetch-list"></div>
+            </section>
+
+            <!-- Von Oben View -->
+            <section id="view-fetchAbove" class="view">
+                <div class="view-header">
+                    <h2>📋 Im Lager</h2>
+                    <button class="btn btn-secondary" onclick="refreshFetchAboveList()">↻</button>
+                </div>
+                <div id="fetchAboveList" class="fetch-list"></div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-view="tables" onclick="switchView('tables')">
+                <span class="nav-icon">🪑</span>
+                <span class="nav-label">Tische</span>
+            </button>
+            <button class="nav-btn" data-view="menu" onclick="switchView('menu')">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Karte</span>
+            </button>
+            <button class="nav-btn" data-view="order" onclick="switchView('order')">
+                <span class="nav-icon">🧾</span>
+                <span class="nav-label">Bestell.</span>
+                <span class="nav-badge" id="orderBadge">0</span>
+            </button>
+            <button class="nav-btn" data-view="fetchAbove" onclick="switchView('fetchAbove')">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Lager</span>
+                <span class="nav-badge above-badge" id="fetchAboveBadge">0</span>
+            </button>
+            <button class="nav-btn" data-view="fetch" onclick="switchView('fetch')">
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">Bestellen</span>
+                <span class="nav-badge fetch-badge" id="fetchBadge">0</span>
+            </button>
+        </nav>
+
+        <!-- Add Table Modal -->
+        <div id="addTableModal" class="modal">
+            <div class="modal-content">
+                <h3>Neuer Tisch</h3>
+                <input type="text" id="tableNameInput" placeholder="Tischname (z.B. Tisch 5)" maxlength="20">
+                <select id="tableAreaSelect" class="area-select">
+                    <option value="">-- Bereich wählen --</option>
+                    <option value="Links">Links</option>
+                    <option value="Mitte">Mitte</option>
+                    <option value="Rechts">Rechts</option>
+                    <option value="Andere">Andere</option>
+                </select>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('addTableModal')">Abbrechen</button>
+                    <button class="btn btn-primary" onclick="addTable()">Erstellen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Comment Modal -->
+        <div id="commentModal" class="modal">
+            <div class="modal-content">
+                <h3>Kommentar hinzufügen</h3>
+                <div id="commentProductName" class="comment-product"></div>
+                <textarea id="commentInput" placeholder="z.B. ohne Zwiebeln, extra Eis..." rows="3"></textarea>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('commentModal')">Abbrechen</button>
+                    <button class="btn btn-primary" onclick="saveComment()">Speichern</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Editor Modal -->
+        <div id="menuEditorModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3>Speisekarte bearbeiten</h3>
+                    <button class="btn btn-secondary" onclick="closeModal('menuEditorModal')">✕</button>
+                </div>
+                <div class="editor-tabs">
+                    <button class="editor-tab active" onclick="showEditorTab('products')">Produkte</button>
+                    <button class="editor-tab" onclick="showEditorTab('categories')">Kategorien</button>
+                </div>
+                <div id="editorProductsTab" class="editor-content">
+                    <div id="productsList" class="products-list"></div>
+                    <button class="btn btn-primary btn-block" onclick="showAddProductModal()">+ Neues Produkt</button>
+                </div>
+                <div id="editorCategoriesTab" class="editor-content" style="display: none;">
+                    <div id="categoriesList" class="categories-list"></div>
+                    <div class="add-category-row">
+                        <input type="text" id="newCategoryInput" placeholder="Neue Kategorie...">
+                        <button class="btn btn-primary" onclick="addCategory()">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div id="productModal" class="modal">
+            <div class="modal-content">
+                <h3 id="productModalTitle">Neues Produkt</h3>
+                <input type="text" id="productNameInput" placeholder="Produktname">
+                <input type="number" id="productPriceInput" placeholder="Preis (z.B. 3.50)" step="0.10" min="0">
+                <input type="text" id="productSizeInput" placeholder="Größe (optional, z.B. 0,3l)">
+                <select id="productCategorySelect" class="category-select"></select>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="productNeedsFetch">
+                    <span>Muss bestellt werden (erscheint in "Zu bestellen")</span>
+                </label>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('productModal')">Abbrechen</button>
+                    <button class="btn btn-danger" id="deleteProductBtn" onclick="deleteCurrentProduct()"
+                        style="display: none;">Löschen</button>
+                    <button class="btn btn-primary" onclick="saveProduct()">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
