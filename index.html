@@ -52,11 +52,10 @@
             <!-- Bestellung View -->
             <section id="view-order" class="view">
                 <div class="view-header">
-                    <h2 id="orderViewTitle">Aktuelle Bestellung</h2>
-                    <div class="header-actions">
-                        <button class="btn btn-secondary filter-btn" id="allOrdersBtn" onclick="toggleAllOrders()">Alle
-                            Tische</button>
-                        <div class="table-badge" id="orderTableBadge">Tisch wählen</div>
+                    <div class="header-left">
+                        <button class="btn btn-secondary back-btn" id="orderBackBtn" onclick="showOrderOverview()"
+                            style="display: none;">← Zurück</button>
+                        <h2 id="orderViewTitle">Alle Bestellungen</h2>
                     </div>
                 </div>
                 <div id="orderList" class="order-list"></div>
@@ -65,7 +64,8 @@
                         <span>Gesamt:</span>
                         <span id="orderTotal">0,00 €</span>
                     </div>
-                    <button class="btn btn-success btn-large" onclick="markAllPaid()">✓ Alles bezahlt</button>
+                    <button class="btn btn-success btn-large" id="markPaidBtn" onclick="markAllPaid()">✓ Alles
+                        bezahlt</button>
                 </div>
             </section>
 

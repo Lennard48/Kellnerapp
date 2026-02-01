@@ -62,7 +62,7 @@ let state = {
     activeCategory: "Alle",
     pendingComment: null, // { orderId, tableId }
     filterOpenOnly: false,
-    showAllOrders: false
+    viewingOrderTableId: null
 };
 
 // ========== INITIALIZATION ==========
@@ -318,94 +318,23 @@ function renderOrder() {
     const container = document.getElementById('orderList');
     const footer = document.getElementById('orderFooter');
     const titleEl = document.getElementById('orderViewTitle');
-    const allOrdersBtn = document.getElementById('allOrdersBtn');
-    const tableBadge = document.getElementById('orderTableBadge');
+    const backBtn = document.getElementById('orderBackBtn');
+    const markPaidBtn = document.getElementById('markPaidBtn');
 
-    // Update button and title state
-    if (allOrdersBtn) {
-        allOrdersBtn.classList.toggle('active', state.showAllOrders);
-    }
+    // Check if we're viewing a specific table or the overview
+    const viewingTable = state.viewingOrderTableId;
 
-    if (state.showAllOrders) {
-        // Show all orders from all tables
-        titleEl.textContent = 'Alle Bestellungen';
-        tableBadge.style.display = 'none';
-
-        // Collect all unpaid orders from all tables
-        const allOrders = [];
-        state.tables.forEach(table => {
-            table.orders.filter(o => !o.isPaid).forEach(order => {
-                allOrders.push({ ...order, tableId: table.id, tableName: table.name });
-            });
-        });
-
-        if (allOrders.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">✨</div>
-                    <p>Keine offenen Bestellungen</p>
-                </div>
-            `;
-            footer.classList.remove('visible');
+    if (viewingTable) {
+        // DETAIL VIEW: Show single table's orders
+        const table = state.tables.find(t => t.id === viewingTable);
+        if (!table) {
+            showOrderOverview();
             return;
         }
 
-        // Group by table
-        const groupedByTable = {};
-        allOrders.forEach(order => {
-            if (!groupedByTable[order.tableId]) {
-                groupedByTable[order.tableId] = { tableName: order.tableName, orders: [] };
-            }
-            groupedByTable[order.tableId].orders.push(order);
-        });
+        titleEl.textContent = `🪑 ${table.name}`;
+        backBtn.style.display = 'inline-flex';
 
-        container.innerHTML = Object.entries(groupedByTable).map(([tableId, group]) => `
-            <div class="order-group">
-                <div class="order-group-header">🪑 ${escapeHtml(group.tableName)} - ${formatPrice(calculateTableTotal(parseInt(tableId)))}</div>
-                ${group.orders.map(order => {
-            const product = PRODUCTS.find(p => p.id === order.productId);
-            const isDelivered = order.isDelivered;
-            return `
-                        <div class="order-item ${isDelivered ? 'delivered' : ''}">
-                            <div class="order-header">
-                                <div class="order-name">${escapeHtml(product.name)}${product.size ? ` (${product.size})` : ''}${isDelivered ? ' ✓' : ''}</div>
-                                <div class="order-price">${formatPrice(product.price * order.quantity)}</div>
-                            </div>
-                            <div class="order-controls">
-                                <div class="quantity-controls">
-                                    <button class="quantity-btn" onclick="updateQuantity(${tableId}, ${order.id}, -1)">−</button>
-                                    <span class="quantity">${order.quantity}</span>
-                                    <button class="quantity-btn" onclick="updateQuantity(${tableId}, ${order.id}, 1)">+</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-        }).join('')}
-            </div>
-        `).join('');
-
-        // Calculate total for all tables
-        const totalAll = state.tables.reduce((sum, t) => sum + calculateTableTotal(t.id), 0);
-        document.getElementById('orderTotal').textContent = formatPrice(totalAll);
-        footer.classList.add('visible');
-
-    } else {
-        // Single table view (original behavior)
-        titleEl.textContent = 'Aktuelle Bestellung';
-        tableBadge.style.display = 'block';
-
-        if (!state.selectedTableId) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">🪑</div>
-                    <p>Bitte wähle zuerst einen Tisch</p>
-                </div>
-            `;
-            footer.classList.remove('visible');
-            return;
-        }
-
-        const table = state.tables.find(t => t.id === state.selectedTableId);
         const unpaidOrders = table.orders.filter(o => !o.isPaid);
 
         if (unpaidOrders.length === 0) {
@@ -422,7 +351,7 @@ function renderOrder() {
         container.innerHTML = unpaidOrders.map(order => {
             const product = PRODUCTS.find(p => p.id === order.productId);
             const timerText = getTimerText(order.timestamp);
-            const isOld = Date.now() - order.timestamp > 10 * 60 * 1000; // 10 minutes
+            const isOld = Date.now() - order.timestamp > 10 * 60 * 1000;
             const isDelivered = order.isDelivered;
 
             return `
@@ -448,16 +377,65 @@ function renderOrder() {
             `;
         }).join('');
 
-        // Update total
-        const total = calculateTableTotal(state.selectedTableId);
+        const total = calculateTableTotal(table.id);
         document.getElementById('orderTotal').textContent = formatPrice(total);
+        markPaidBtn.textContent = '✓ Alles bezahlt';
+        footer.classList.add('visible');
+
+    } else {
+        // OVERVIEW: Show all tables with their totals
+        titleEl.textContent = 'Alle Bestellungen';
+        backBtn.style.display = 'none';
+
+        // Get tables with open orders
+        const tablesWithOrders = state.tables.filter(t => {
+            const total = calculateTableTotal(t.id);
+            return total > 0;
+        });
+
+        if (tablesWithOrders.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p>Keine offenen Bestellungen</p>
+                </div>
+            `;
+            footer.classList.remove('visible');
+            return;
+        }
+
+        container.innerHTML = tablesWithOrders.map(table => {
+            const total = calculateTableTotal(table.id);
+            const orderCount = getTableOrderCount(table.id);
+            return `
+                <div class="table-order-card" onclick="viewTableOrders(${table.id})">
+                    <div class="table-order-name">🪑 ${escapeHtml(table.name)}</div>
+                    <div class="table-order-info">${orderCount} Bestellung${orderCount !== 1 ? 'en' : ''}</div>
+                    <div class="table-order-total">${formatPrice(total)}</div>
+                    <div class="table-order-arrow">→</div>
+                </div>
+            `;
+        }).join('');
+
+        // Calculate total for all tables
+        const totalAll = tablesWithOrders.reduce((sum, t) => sum + calculateTableTotal(t.id), 0);
+        document.getElementById('orderTotal').textContent = formatPrice(totalAll);
+        markPaidBtn.textContent = '✓ Alle bezahlen';
         footer.classList.add('visible');
     }
 }
 
-// Toggle all orders view
-function toggleAllOrders() {
-    state.showAllOrders = !state.showAllOrders;
+// Show table overview
+function showOrderOverview() {
+    state.viewingOrderTableId = null;
+    renderOrder();
+}
+
+// View specific table's orders
+function viewTableOrders(tableId) {
+    state.viewingOrderTableId = tableId;
+    state.selectedTableId = tableId; // Also select this table
+    saveState();
     renderOrder();
 }
 
@@ -672,10 +650,11 @@ function refreshFetchAboveList() {
 // Navigate to table's order view
 function goToTableOrder(tableId) {
     state.selectedTableId = tableId;
+    state.viewingOrderTableId = tableId;
     saveState();
     updateCurrentTableDisplay();
     switchView('order');
-    renderOrderList();
+    renderOrder();
 }
 
 // Copy fetch list to clipboard for WhatsApp
