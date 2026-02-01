@@ -127,37 +127,63 @@ function renderTables() {
         return;
     }
 
-    container.innerHTML = state.tables.map(table => {
-        const total = calculateTableTotal(table.id);
-        const orderCount = getTableOrderCount(table.id);
-        const isSelected = table.id === state.selectedTableId;
+    // Group tables by area
+    const areas = {};
+    state.tables.forEach(table => {
+        const area = table.area || 'Ohne Bereich';
+        if (!areas[area]) areas[area] = [];
+        areas[area].push(table);
+    });
 
-        return `
-            <div class="table-card ${isSelected ? 'selected' : ''}" onclick="selectTable(${table.id})">
-                <div class="table-name">${escapeHtml(table.name)}</div>
-                <div class="table-info">${orderCount} Bestellung${orderCount !== 1 ? 'en' : ''}</div>
-                <div class="table-total">${formatPrice(total)}</div>
-                <div class="table-actions">
-                    <button class="btn btn-small btn-secondary" onclick="event.stopPropagation(); deleteTable(${table.id})">🗑️</button>
+    // Sort areas (Links, Mitte, Rechts, Außen, Ohne Bereich)
+    const areaOrder = ['Links', 'Mitte', 'Rechts', 'Außen', 'Ohne Bereich'];
+    const sortedAreas = Object.keys(areas).sort((a, b) => {
+        const aIdx = areaOrder.indexOf(a);
+        const bIdx = areaOrder.indexOf(b);
+        return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+    });
+
+    let html = '';
+    sortedAreas.forEach(area => {
+        if (sortedAreas.length > 1 || area !== 'Ohne Bereich') {
+            html += `<div class="area-header">${escapeHtml(area)}</div>`;
+        }
+        areas[area].forEach(table => {
+            const total = calculateTableTotal(table.id);
+            const orderCount = getTableOrderCount(table.id);
+            const isSelected = table.id === state.selectedTableId;
+
+            html += `
+                <div class="table-card ${isSelected ? 'selected' : ''}" onclick="selectTable(${table.id})">
+                    <div class="table-name">${escapeHtml(table.name)}</div>
+                    <div class="table-info">${orderCount} Bestellung${orderCount !== 1 ? 'en' : ''}</div>
+                    <div class="table-total">${formatPrice(total)}</div>
+                    <div class="table-actions">
+                        <button class="btn btn-small btn-secondary" onclick="event.stopPropagation(); deleteTable(${table.id})">🗑️</button>
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        });
+    });
+    container.innerHTML = html;
 }
 
 function showAddTableModal() {
     document.getElementById('addTableModal').classList.add('active');
     document.getElementById('tableNameInput').value = '';
+    document.getElementById('tableAreaSelect').value = '';
     document.getElementById('tableNameInput').focus();
 }
 
 function addTable() {
     const name = document.getElementById('tableNameInput').value.trim();
+    const area = document.getElementById('tableAreaSelect').value;
     if (!name) return;
 
     const newTable = {
         id: Date.now(),
         name: name,
+        area: area || null,
         orders: []
     };
 
@@ -442,11 +468,11 @@ function renderFetchList() {
         groupedByTable[item.tableId].items.push(item);
     });
 
-    container.innerHTML = Object.values(groupedByTable).map(group => `
+    container.innerHTML = Object.entries(groupedByTable).map(([tableId, group]) => `
         <div class="fetch-group">
-            <div class="fetch-group-header">
+            <div class="fetch-group-header" onclick="goToTableOrder(${tableId})" style="cursor: pointer;">
                 <span>🪑 ${escapeHtml(group.tableName)}</span>
-                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück</span>
+                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück ➜</span>
             </div>
             ${group.items.map(item => `
                 <div class="fetch-item-row">
@@ -455,7 +481,7 @@ function renderFetchList() {
                         ${item.comment ? `<div class="fetch-item-comment">💬 ${escapeHtml(item.comment)}</div>` : ''}
                     </div>
                     <span class="fetch-item-timer">⏱️ ${getTimerText(item.timestamp)}</span>
-                    <span class="fetch-item-qty">${item.quantity}x</span>
+                    <span class="fetch-item-qty${item.quantity > 1 ? ' multi' : ''}">${item.quantity}x</span>
                     <button class="btn btn-small btn-warning" onclick="markDelivered(${item.tableId}, ${item.id})">📤</button>
                 </div>
             `).join('')}
@@ -511,11 +537,11 @@ function renderFetchFromAbove() {
         groupedByTable[item.tableId].items.push(item);
     });
 
-    container.innerHTML = Object.values(groupedByTable).map(group => `
+    container.innerHTML = Object.entries(groupedByTable).map(([tableId, group]) => `
         <div class="fetch-group">
-            <div class="fetch-group-header">
+            <div class="fetch-group-header" onclick="goToTableOrder(${tableId})" style="cursor: pointer;">
                 <span>🪑 ${escapeHtml(group.tableName)}</span>
-                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück</span>
+                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück ➜</span>
             </div>
             ${group.items.map(item => `
                 <div class="fetch-item-row">
@@ -524,7 +550,7 @@ function renderFetchFromAbove() {
                         ${item.comment ? `<div class="fetch-item-comment">💬 ${escapeHtml(item.comment)}</div>` : ''}
                     </div>
                     <span class="fetch-item-timer">⏱️ ${getTimerText(item.timestamp)}</span>
-                    <span class="fetch-item-qty">${item.quantity}x</span>
+                    <span class="fetch-item-qty${item.quantity > 1 ? ' multi' : ''}">${item.quantity}x</span>
                     <button class="btn btn-small btn-warning" onclick="markDelivered(${item.tableId}, ${item.id})">📤</button>
                 </div>
             `).join('')}
@@ -535,6 +561,55 @@ function renderFetchFromAbove() {
 function refreshFetchAboveList() {
     renderFetchFromAbove();
     showToast('Aktualisiert ↻');
+}
+
+// Navigate to table's order view
+function goToTableOrder(tableId) {
+    state.selectedTableId = tableId;
+    saveState();
+    updateCurrentTableDisplay();
+    switchView('order');
+    renderOrderList();
+}
+
+// Copy fetch list to clipboard for WhatsApp
+function copyFetchListToClipboard() {
+    const fetchItems = [];
+
+    state.tables.forEach(table => {
+        table.orders.filter(o => !o.isPaid && !o.isDelivered).forEach(order => {
+            const product = PRODUCTS.find(p => p.id === order.productId);
+            if (product && product.fetchFromBelow) {
+                // Check if we already have this product
+                const existing = fetchItems.find(f => f.productId === order.productId);
+                if (existing) {
+                    existing.quantity += order.quantity;
+                } else {
+                    fetchItems.push({
+                        productId: order.productId,
+                        name: product.name + (product.size ? ` (${product.size})` : ''),
+                        quantity: order.quantity
+                    });
+                }
+            }
+        });
+    });
+
+    if (fetchItems.length === 0) {
+        showToast('Keine Artikel zum Kopieren');
+        return;
+    }
+
+    // Create simple text list
+    const text = "Von unten holen:\n" + fetchItems.map(item =>
+        `${item.quantity}x ${item.name}`
+    ).join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 In Zwischenablage kopiert!');
+    }).catch(() => {
+        showToast('Fehler beim Kopieren');
+    });
 }
 
 // ========== UTILITIES ==========

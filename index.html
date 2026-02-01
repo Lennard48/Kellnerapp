@@ -65,7 +65,11 @@
             <section id="view-fetch" class="view">
                 <div class="view-header">
                     <h2>⬇️ Von unten</h2>
-                    <button class="btn btn-secondary" onclick="refreshFetchList()">↻</button>
+                    <div class="header-actions">
+                        <button class="btn btn-success" onclick="copyFetchListToClipboard()"
+                            title="Für WhatsApp kopieren">📋</button>
+                        <button class="btn btn-secondary" onclick="refreshFetchList()">↻</button>
+                    </div>
                 </div>
                 <div id="fetchList" class="fetch-list"></div>
             </section>
@@ -112,6 +116,13 @@
             <div class="modal-content">
                 <h3>Neuer Tisch</h3>
                 <input type="text" id="tableNameInput" placeholder="Tischname (z.B. Tisch 5)" maxlength="20">
+                <select id="tableAreaSelect" class="area-select">
+                    <option value="">-- Bereich wählen --</option>
+                    <option value="Links">Links</option>
+                    <option value="Mitte">Mitte</option>
+                    <option value="Rechts">Rechts</option>
+                    <option value="Außen">Außen</option>
+                </select>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" onclick="closeModal('addTableModal')">Abbrechen</button>
                     <button class="btn btn-primary" onclick="addTable()">Erstellen</button>
