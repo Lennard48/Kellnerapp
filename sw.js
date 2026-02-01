@@ -1,5 +1,5 @@
 // Service Worker for Lennards Kellnerapp
-const CACHE_NAME = 'kellner-app-v11';
+const CACHE_NAME = 'kellner-app-v12';
 const BASE_PATH = '/Kellnerapp';
 const ASSETS = [
     `${BASE_PATH}/`,

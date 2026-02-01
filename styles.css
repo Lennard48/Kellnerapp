@@ -280,6 +280,17 @@ body {
     color: var(--text-primary);
     font-size: 1rem;
     margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+/* Goto Order Button */
+.goto-order-btn {
+    background: var(--accent);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 /* Category Tabs */

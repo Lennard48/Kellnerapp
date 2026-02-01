@@ -494,7 +494,7 @@ function renderFetchList() {
         <div class="fetch-group">
             <div class="fetch-group-header" onclick="goToTableOrder(${tableId})" style="cursor: pointer;">
                 <span>🪑 ${escapeHtml(group.tableName)}</span>
-                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück ➜</span>
+                <span class="goto-order-btn">📋 Zur Bestellung</span>
             </div>
             ${group.items.map(item => `
                 <div class="fetch-item-row">
@@ -563,7 +563,7 @@ function renderFetchFromAbove() {
         <div class="fetch-group">
             <div class="fetch-group-header" onclick="goToTableOrder(${tableId})" style="cursor: pointer;">
                 <span>🪑 ${escapeHtml(group.tableName)}</span>
-                <span>${group.items.reduce((sum, i) => sum + i.quantity, 0)} Stück ➜</span>
+                <span class="goto-order-btn">📋 Zur Bestellung</span>
             </div>
             ${group.items.map(item => `
                 <div class="fetch-item-row">
@@ -622,8 +622,8 @@ function copyFetchListToClipboard() {
         return;
     }
 
-    // Create simple text list
-    const text = "Von unten holen:\n" + fetchItems.map(item =>
+    // Create simple text list (just the items, no header)
+    const text = fetchItems.map(item =>
         `${item.quantity}x ${item.name}`
     ).join('\n');
 
