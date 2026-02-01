@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kellner App - Die einfachste Bestell-App für Gastronomie & Events</title>
+    <meta name="description"
+        content="Nimm Bestellungen auf, verwalte Tische, berechne Preise - alles offline auf deinem Handy. Perfekt für Fasching, Feste und kleine Gastronomie.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --accent: #e94560;
+            --accent-light: #ff6b6b;
+            --success: #00d26a;
+            --text: #ffffff;
+            --text-muted: #a0a0b0;
+            --gradient: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero-text h1 span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            max-width: 480px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gradient);
+            color: white;
+            padding: 18px 36px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(233, 69, 96, 0.5);
+        }
+
+        .hero-note {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .hero-image {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 280px;
+            height: 560px;
+            background: var(--bg-card);
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .phone-header {
+            background: var(--bg-card);
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 1px solid #2a2a4a;
+        }
+
+        .phone-content {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mock-table {
+            background: var(--bg-card);
+            padding: 14px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mock-table-name {
+            font-weight: 600;
+        }
+
+        .mock-table-price {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .phone-nav {
+            background: var(--bg-card);
+            padding: 12px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #2a2a4a;
+        }
+
+        .phone-nav span {
+            font-size: 1.2rem;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 60px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .benefit-card {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .benefit-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            padding: 80px 0;
+            background: var(--bg-card);
+        }
+
+        .testimonial {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .quote-icon {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .testimonial-text {
+            font-size: 1.4rem;
+            font-style: italic;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            color: var(--text-muted);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 48px;
+            border-radius: 24px;
+            border: 2px solid var(--accent);
+            position: relative;
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient);
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .pricing-price span {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-note {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .custom-note {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+            font-size: 0.9rem;
+        }
+
+        .custom-note strong {
+            color: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.4rem;
+            }
+
+            .hero-text .subtitle {
+                margin: 0 auto 32px;
+            }
+
+            .hero-image {
+                order: -1;
+            }
+
+            .phone-mockup {
+                width: 240px;
+                height: 480px;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Bestellungen aufnehmen <span>ohne Zettelchaos</span></h1>
+                    <p class="subtitle">
+                        Die einfachste App für Kellner, Vereinsfeste und Events.
+                        Tische verwalten, Preise berechnen, Bestellungen tracken –
+                        alles offline auf deinem Handy.
+                    </p>
+                    <a href="https://paypal.me/DEIN_LINK" class="cta-button" id="buyBtn">
+                        🚀 Jetzt holen – Preis bestimmst du!
+                    </a>
+                    <p class="hero-note">Einmalzahlung • Kein Abo • Sofort einsatzbereit</p>
+                </div>
+                <div class="hero-image">
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="phone-header">🍽️ Kellner App</div>
+                            <div class="phone-content">
+                                <div class="mock-table">
+                                    <span class="mock-table-name">🪑 Tisch 1</span>
+                                    <span class="mock-table-price">24,50 €</span>
+                                </div>
+                                <div class="mock-table">
+                                    <span class="mock-table-name">🪑 Tisch 3</span>
+                                    <span class="mock-table-price">18,00 €</span>
+                                </div>
+                                <div class="mock-table">
+                                    <span class="mock-table-name">🪑 Tisch 7</span>
+                                    <span class="mock-table-price">42,30 €</span>
+                                </div>
+                                <div class="mock-table" style="opacity: 0.5;">
+                                    <span class="mock-table-name">🪑 Tisch 2</span>
+                                    <span class="mock-table-price">0,00 €</span>
+                                </div>
+                            </div>
+                            <div class="phone-nav">
+                                <span>🪑</span>
+                                <span>📋</span>
+                                <span>🧾</span>
+                                <span>📦</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2 class="section-title">Warum Kellner nutzen?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">📱</div>
+                    <h3>100% Offline</h3>
+                    <p>Funktioniert ohne Internet. Perfekt für Veranstaltungen ohne WLAN.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h3>Blitzschnell</h3>
+                    <p>Ein Tap = Bestellung aufgenommen. Keine komplizierten Menüs.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📝</div>
+                    <h3>Eigene Speisekarte</h3>
+                    <p>Füge deine Produkte und Preise ein. Kategorien frei definierbar.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3>Automatische Preise</h3>
+                    <p>Keine Rechnerei mehr. Die App berechnet alles korrekt.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📤</div>
+                    <h3>Bestellliste Export</h3>
+                    <p>Kopiere Bestellungen direkt für WhatsApp an die Küche.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔧</div>
+                    <h3>Individuelle Anpassungen</h3>
+                    <p>Spezielle Wünsche? Auf Anfrage passe ich die App für dich an.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <div class="testimonial">
+                <div class="quote-icon">"</div>
+                <p class="testimonial-text">
+                    Endlich kein Zettelchaos mehr beim Vereinsfest!
+                    Die App ist super einfach und hat uns den Stress komplett genommen.
+                </p>
+                <p class="testimonial-author">— Vereinsmitglied, Fasching 2025</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title">Einfach. Fair. Einmalig.</h2>
+            <div class="pricing-card">
+                <div class="pricing-badge">Pay what you want</div>
+                <h3 class="pricing-title">Kellner App Vollversion</h3>
+                <div class="pricing-price">Dein Preis <span>einmalig</span></div>
+                <p class="pricing-note">Du entscheidest, was dir die App wert ist</p>
+
+                <ul class="pricing-features">
+                    <li>Unbegrenzt Tische & Bestellungen</li>
+                    <li>Eigene Speisekarte erstellen</li>
+                    <li>Funktioniert komplett offline</li>
+                    <li>WhatsApp-Export für Bestellungen</li>
+                    <li>Alle zukünftigen Updates inklusive</li>
+                    <li>Kein Abo, kein Kleingedrucktes</li>
+                </ul>
+
+                <a href="https://paypal.me/DEIN_LINK" class="cta-button" style="width: 100%; justify-content: center;">
+                    💳 Jetzt mit PayPal bezahlen
+                </a>
+
+                <div class="custom-note">
+                    <strong>💡 Individuelle Anpassungen möglich!</strong><br>
+                    Du brauchst spezielle Funktionen? Schreib mir – ich passe die App schnell für dich an.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Nach der Zahlung erhältst du Zugang zur App. Bei Fragen: <a
+                    href="mailto:deine@email.de">deine@email.de</a></p>
+            <p style="margin-top: 12px;">© 2026 Kellner App</p>
+        </div>
+    </footer>
+
+    <!-- Thank You Modal / Logic -->
+    <script>
+        // Simple redirect logic after PayPal
+        // In a real scenario, you'd handle this differently
+        document.querySelectorAll('.cta-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Save that user clicked buy
+                localStorage.setItem('kellnerPurchaseIntent', Date.now());
+            });
+        });
+
+        // Check if returning from PayPal (simple approach)
+        if (document.referrer.includes('paypal.com') || localStorage.getItem('kellnerPurchaseIntent')) {
+            // Could show thank you message or redirect to app
+        }
+    </script>
+
+</body>
+
+</html>

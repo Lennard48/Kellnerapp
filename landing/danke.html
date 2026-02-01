@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danke! - Kellner App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --accent: #e94560;
+            --success: #00d26a;
+            --text: #ffffff;
+            --text-muted: #a0a0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        h1 span {
+            color: var(--success);
+        }
+
+        .message {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+
+        .app-link {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), #ff6b6b);
+            color: white;
+            padding: 20px 48px;
+            border-radius: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .app-link:hover {
+            transform: translateY(-3px);
+        }
+
+        .instructions {
+            margin-top: 48px;
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: left;
+        }
+
+        .instructions h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2a2a4a;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .step-number {
+            background: var(--accent);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .step-text strong {
+            color: var(--text);
+        }
+
+        .note {
+            margin-top: 32px;
+            padding: 16px;
+            background: rgba(0, 210, 106, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .note strong {
+            color: var(--success);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="success-icon">🎉</div>
+        <h1>Danke für deine <span>Unterstützung!</span></h1>
+        <p class="message">
+            Deine Zahlung ist angekommen.
+            Du kannst die Kellner App jetzt sofort nutzen!
+        </p>
+
+        <a href="/Kellnerapp/public/" class="app-link">
+            🍽️ Zur Kellner App
+        </a>
+
+        <div class="instructions">
+            <h2>📱 So installierst du die App auf deinem Handy</h2>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <strong>Öffne den Link</strong> oben in Safari (iPhone) oder Chrome (Android)
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <strong>Tippe auf "Teilen"</strong> (Safari: 📤 unten, Chrome: ⋮ oben rechts)
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <strong>Wähle "Zum Home-Bildschirm"</strong> – die App erscheint wie eine normale App
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">
+                    <strong>Fertig!</strong> Die App funktioniert jetzt offline auf deinem Gerät
+                </div>
+            </div>
+        </div>
+
+        <div class="note">
+            <strong>💡 Tipp:</strong> Richte zuerst deine Speisekarte über den "⚙️ Bearbeiten" Button ein!
+        </div>
+    </div>
+</body>
+
+</html>
