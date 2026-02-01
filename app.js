@@ -103,6 +103,12 @@ function switchView(viewName) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
 
+    // Show/hide header table badge (only show on menu view)
+    const headerInfo = document.querySelector('.header-info');
+    if (headerInfo) {
+        headerInfo.style.display = viewName === 'menu' ? 'block' : 'none';
+    }
+
     // Render content based on view
     if (viewName === 'order') {
         renderOrder();
@@ -240,10 +246,8 @@ function deleteTable(tableId) {
 function updateCurrentTableDisplay() {
     const table = state.tables.find(t => t.id === state.selectedTableId);
     const currentTableEl = document.getElementById('currentTable');
-    const menuBadgeEl = document.getElementById('menuTableBadge');
 
     if (currentTableEl) currentTableEl.textContent = table ? table.name : 'Kein Tisch';
-    if (menuBadgeEl) menuBadgeEl.textContent = table ? table.name : 'Tisch wählen';
 }
 
 // ========== MENU ==========
