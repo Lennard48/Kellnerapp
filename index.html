@@ -30,7 +30,11 @@
             <section id="view-tables" class="view active">
                 <div class="view-header">
                     <h2>Tische</h2>
-                    <button class="btn btn-primary" onclick="showAddTableModal()">+ Neuer Tisch</button>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary filter-btn" id="filterOpenBtn" onclick="toggleOpenFilter()">💰
+                            Offen</button>
+                        <button class="btn btn-primary" onclick="showAddTableModal()">+ Neuer Tisch</button>
+                    </div>
                 </div>
                 <div id="tablesList" class="tables-grid"></div>
             </section>

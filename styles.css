@@ -159,6 +159,12 @@ body {
     border: 1px solid var(--border);
 }
 
+.filter-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
 .btn-success {
     background: var(--success);
     color: white;

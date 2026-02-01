@@ -60,7 +60,8 @@ let state = {
     tables: [],
     selectedTableId: null,
     activeCategory: "Alle",
-    pendingComment: null // { orderId, tableId }
+    pendingComment: null, // { orderId, tableId }
+    filterOpenOnly: false
 };
 
 // ========== INITIALIZATION ==========
@@ -117,11 +118,23 @@ function switchView(viewName) {
 function renderTables() {
     const container = document.getElementById('tablesList');
 
-    if (state.tables.length === 0) {
+    // Update filter button state
+    const filterBtn = document.getElementById('filterOpenBtn');
+    if (filterBtn) {
+        filterBtn.classList.toggle('active', state.filterOpenOnly);
+    }
+
+    // Get tables to display (optionally filtered)
+    let tablesToShow = state.tables;
+    if (state.filterOpenOnly) {
+        tablesToShow = state.tables.filter(t => calculateTableTotal(t.id) > 0);
+    }
+
+    if (tablesToShow.length === 0) {
         container.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1;">
-                <div class="empty-icon">🪑</div>
-                <p>Noch keine Tische.<br>Erstelle einen neuen Tisch!</p>
+                <div class="empty-icon">${state.filterOpenOnly ? '✅' : '🪑'}</div>
+                <p>${state.filterOpenOnly ? 'Keine offenen Beträge!' : 'Noch keine Tische.<br>Erstelle einen neuen Tisch!'}</p>
             </div>
         `;
         return;
@@ -129,7 +142,7 @@ function renderTables() {
 
     // Group tables by area
     const areas = {};
-    state.tables.forEach(table => {
+    tablesToShow.forEach(table => {
         const area = table.area || 'Ohne Bereich';
         if (!areas[area]) areas[area] = [];
         areas[area].push(table);
@@ -193,6 +206,11 @@ function addTable() {
     closeModal('addTableModal');
     renderTables();
     updateCurrentTableDisplay();
+}
+
+function toggleOpenFilter() {
+    state.filterOpenOnly = !state.filterOpenOnly;
+    renderTables();
 }
 
 function selectTable(tableId) {
@@ -371,6 +389,7 @@ function updateQuantity(tableId, orderId, delta) {
 
     saveState();
     renderOrder();
+    renderTables();
     updateBadges();
 }
 
@@ -380,6 +399,9 @@ function markDelivered(tableId, orderId) {
     order.isDelivered = true;
     saveState();
     renderOrder();
+    renderTables();
+    renderFetchList();
+    renderFetchFromAbove();
     updateBadges();
     showToast('Als ausgeliefert markiert ✓');
 }
